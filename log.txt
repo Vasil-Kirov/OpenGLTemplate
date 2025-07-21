@@ -1,0 +1,4 @@
+[INFO] Vendor:   ATI Technologies Inc.
+[INFO] Renderer: AMD Radeon RX 6600 XT
+[INFO] Version:  4.6.0 Core Profile Context 25.6.1.250522
+[INFO] Exiting...
