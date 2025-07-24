@@ -1,4 +1,3 @@
-
 #include "gl/texture.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -95,7 +94,7 @@ int main(void)
 		SDL_Quit();
 		return 1;
 	}
-	Shader *main_shader = compile_shader(&renderer, &vert_shader, &frag_shader);
+	Shader *main_shader = compile_shader(&renderer, (Asset[]){vert_shader, frag_shader}, 2);
 	if(!main_shader)
 	{
 		SDL_Quit();

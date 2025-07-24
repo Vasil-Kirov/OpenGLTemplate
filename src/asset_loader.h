@@ -16,7 +16,7 @@ typedef enum {
 typedef struct {
 	AssetType type;
 	char *path;
-	char *data;
+	u8 *data;
 	size_t len;
 } Asset;
 
@@ -30,6 +30,7 @@ AssetLoader make_asset_loader(String8 asset_directory);
 Asset load_asset(AssetLoader *loader, String8 asset_name);
 Asset load_image(AssetLoader *loader, String8 asset_name);
 void free_asset(AssetLoader *loader, Asset *asset);
+Asset read_entire_file(const char *file_name);
 
 #define as_img(asset) ((Image *)((asset).data))
 

@@ -25,6 +25,14 @@ typedef double   f64;
 #define false (b8)0
 #endif
 
+#ifndef max
+#define max(a, b) a > b ? a : b
+#endif
+
+#ifndef min
+#define min(a, b) a > b ? b : a
+#endif
+
 #define BIT(x) (1 << (x))
 
 #define KB(N) (((unsigned long long)N) << 10)

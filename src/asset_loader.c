@@ -6,7 +6,7 @@
 #include <string.h>
 #include <SDL3/SDL.h>
 
-Asset read_entire_file(char *file_name)
+Asset read_entire_file(const char *file_name)
 {
 	SDL_IOStream *io = SDL_IOFromFile(file_name, "rb");
 	if(io == NULL) return (Asset){};
@@ -96,7 +96,7 @@ Asset load_image(AssetLoader *loader, String8 asset_name)
 	Asset asset = {};
 	asset.type = AT_Image;
 	asset.path = full_path;
-	asset.data = (char *)img;
+	asset.data = (u8 *)img;
 	asset.len = sizeof(void*);
 
 	return asset;

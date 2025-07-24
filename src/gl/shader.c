@@ -2,6 +2,7 @@
 #include "../log.h"
 #include "../renderer.h"
 #include <stdbool.h>
+#include <stdlib.h>
 
 GLuint compile_shader_component(struct Renderer *renderer, Asset *shader, ShaderType st)
 {
@@ -16,9 +17,25 @@ GLuint compile_shader_component(struct Renderer *renderer, Asset *shader, Shader
 		{
 			res = glCreateShader(GL_FRAGMENT_SHADER);
 		} break;
+		case ShaderType_TessControl:
+		{
+			res = glCreateShader(GL_TESS_CONTROL_SHADER);
+		} break;
+		case ShaderType_TessEval:
+		{
+			res = glCreateShader(GL_TESS_EVALUATION_SHADER);
+		} break;
+		case ShaderType_Geometry:
+		{
+			res = glCreateShader(GL_GEOMETRY_SHADER);
+		} break;
+		case ShaderType_Compute:
+		{
+			res = glCreateShader(GL_COMPUTE_SHADER);
+		} break;
 	}
 	
-	const char *data = shader->data;
+	const char *data = (const char *)shader->data;
 	int len = shader->len;
 	glShaderSource(res, 1, &data, &len);
 	
@@ -36,15 +53,24 @@ GLuint compile_shader_component(struct Renderer *renderer, Asset *shader, Shader
 	return res;
 }
 
-Shader *compile_shader(struct Renderer *renderer, Asset *vertex, Asset *fragment)
+Shader *compile_shader(struct Renderer *renderer, Asset *shader_files, size_t shader_count)
 {
-	GLuint vert = compile_shader_component(renderer, vertex, ShaderType_Vertex);
-	GLuint frag = compile_shader_component(renderer, fragment, ShaderType_Pixel);
-	if(vert == -1 || frag == -1) return NULL;
+	GLuint *compiled_shaders = (GLuint *)malloc(sizeof(GLuint) * shader_count);
+	if(compiled_shaders == NULL) return NULL;
+
+	for(int i = 0; i < shader_count; ++i)
+	{
+		compiled_shaders[i] = compile_shader_component(renderer, &shader_files[i], ShaderType_Vertex);
+		if(compiled_shaders[i] == -1) return NULL;
+	}
+
 
 	GLuint shader_program = glCreateProgram();
-	glAttachShader(shader_program, vert);
-	glAttachShader(shader_program, frag);
+	for(int i = 0; i < shader_count; ++i)
+	{
+		glAttachShader(shader_program, compiled_shaders[i]);
+	}
+
 	glLinkProgram(shader_program);
 	glUseProgram(shader_program);
 	
@@ -54,13 +80,17 @@ Shader *compile_shader(struct Renderer *renderer, Asset *vertex, Asset *fragment
 	if(!success)
 	{
 		glGetProgramInfoLog(shader_program, 512, NULL, info_log);
-		VERRO("Linking %s and %s failed: %s", vertex->path, fragment->path, info_log);
+		VERRO("Linking shader program failed: %s", info_log);
 		return NULL;
 	}
-	glDetachShader(shader_program, vert);
-	glDetachShader(shader_program, frag);
-	glDeleteShader(vert);
-	glDeleteShader(frag);
+
+	for(int i = 0; i < shader_count; ++i)
+	{
+		GLuint s = compiled_shaders[i];
+		glDetachShader(shader_program, s);
+		glDeleteShader(s);
+	}
+	free(compiled_shaders);
 
 	Shader *shader = new_t(Shader, &renderer->state_allocator);
 	if(shader == NULL)

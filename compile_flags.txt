@@ -1,3 +1,4 @@
 -Iinclude
 -IC:\SDL3\include
+-std=c2x
 

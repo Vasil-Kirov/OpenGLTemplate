@@ -1,4 +1,10 @@
 #pragma once
+#include "base.h"
+
+typedef struct __attribute__((packed)) {
+	i32 x;
+	i32 y;
+} iv2;
 
 typedef struct __attribute__((packed)) {
 	float x;
@@ -18,6 +24,10 @@ typedef struct {
 	float w;
 } v4;
 
+static inline iv2 IV2(i32 x, i32 y)
+{
+	return (iv2){x, y};
+}
 
 static inline v2 V2(float x, float y)
 {
