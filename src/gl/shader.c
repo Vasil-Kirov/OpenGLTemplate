@@ -53,14 +53,14 @@ GLuint compile_shader_component(struct Renderer *renderer, Asset *shader, Shader
 	return res;
 }
 
-Shader *compile_shader(struct Renderer *renderer, Asset *shader_files, size_t shader_count)
+Shader *compile_shader(struct Renderer *renderer, Asset *shader_files, ShaderType *types, size_t shader_count)
 {
 	GLuint *compiled_shaders = (GLuint *)malloc(sizeof(GLuint) * shader_count);
 	if(compiled_shaders == NULL) return NULL;
 
 	for(int i = 0; i < shader_count; ++i)
 	{
-		compiled_shaders[i] = compile_shader_component(renderer, &shader_files[i], ShaderType_Vertex);
+		compiled_shaders[i] = compile_shader_component(renderer, &shader_files[i], types[i]);
 		if(compiled_shaders[i] == -1) return NULL;
 	}
 

@@ -23,8 +23,29 @@ typedef struct {
 
 extern FILE *log_output;
 
+void print_mat4(m4 m)
+{
+	VINFO("MATRIX");
+	VINFO("%f %f %f %f", m.m[0][0], m.m[0][1], m.m[0][2], m.m[0][3]);
+	VINFO("%f %f %f %f", m.m[1][0], m.m[1][1], m.m[1][2], m.m[1][3]);
+	VINFO("%f %f %f %f", m.m[2][0], m.m[2][1], m.m[2][2], m.m[2][3]);
+	VINFO("%f %f %f %f", m.m[3][0], m.m[3][1], m.m[3][2], m.m[3][3]);
+}
+
 int main(void)
 {
+	m4 start = M4(
+		0, 2, 0, 0,
+		-2, 0, 0, 0,
+		0, 0, 2, 0,
+		5, -3, 2, 1);
+	m4 invert;
+	inverse_matrix(start, &invert);
+	print_mat4(start);
+	print_mat4(invert);
+	print_mat4(mat4_multiply(start, invert));
+	
+
 	fopen_s(&log_output, "log.txt", "w");
 
 	if(!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS))
@@ -94,7 +115,7 @@ int main(void)
 		SDL_Quit();
 		return 1;
 	}
-	Shader *main_shader = compile_shader(&renderer, (Asset[]){vert_shader, frag_shader}, 2);
+	Shader *main_shader = compile_shader(&renderer, (Asset[]){vert_shader, frag_shader}, (ShaderType[]){ShaderType_Vertex, ShaderType_Pixel}, 2);
 	if(!main_shader)
 	{
 		SDL_Quit();

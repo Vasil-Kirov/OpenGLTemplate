@@ -20,7 +20,7 @@ typedef struct {
 	GLuint program;
 } Shader;
 
-Shader *compile_shader(struct Renderer *renderer, Asset *shaders, size_t shader_count);
+Shader *compile_shader(struct Renderer *renderer, Asset *shaders, ShaderType *shader_types, size_t shader_count);
 void set_shader(struct Renderer *renderer, Shader *shader);
 b8 set_shader_uniform_texture(struct Renderer *renderer, Shader *shader, const char *name, Texture *t, int unit);
 
