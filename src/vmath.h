@@ -136,12 +136,12 @@ static inline v4 V4(float x, float y, float z, float w)
 
 
 inline double
-DegToRad(f32 degrees)
+deg_to_rad(f32 degrees)
 {
 	return (double)(degrees * (PI / 180));
 }
 inline double
-RadToDeg(f32 Rad)
+rad_to_deg(f32 Rad)
 {
 	return (double)(Rad * (180.0f / PI));
 }
@@ -250,7 +250,7 @@ projection(f32 WidthOverHeight, f32 FOV)
 	f32 Near = 1.0f;
 	f32 Far = 100.0f;
 
-	f32 f = 1.0f / tanf(DegToRad(FOV / 2.0f));
+	f32 f = 1.0f / tanf(deg_to_rad(FOV / 2.0f));
 	f32 fn = 1.0f / (Near - Far);
 
 	f32 a = f / WidthOverHeight;
@@ -321,12 +321,13 @@ mat4_v3_multiply(m4 A, v3 B)
 }
 
 inline f32
-normalize_between(f32 x, f32 minx, f32 maxx, f32 a, f32 b)
+map_in_range(f32 x, f32 minx, f32 maxx, f32 a, f32 b)
 {
 	f32 Result = ((b - a) * ((x - minx) / (maxx - minx)) + a);
 	return Result;
 }
 
+#if 0
 inline float
 normalize_coordinate(float x, float maxx, float minx)
 {
@@ -334,33 +335,26 @@ normalize_coordinate(float x, float maxx, float minx)
 	Result = (2.0f * ((x - minx) / (maxx - minx))) - 1.0f;
 	return Result;
 }
-
-inline float
-normalize_tex_coordinate(float x, float maxx, float minx)
-{
-	float Result;
-	Result = ((x - minx) / (maxx - minx));
-	return Result;
-}
+#endif
 
 inline v3
-normalize_v3(v3 target, float minx, float maxx, float from, float to)
+v3_map_in_range(v3 target, float minx, float maxx, float from, float to)
 {
 	v3 result = {};
-	result.x = normalize_between(target.x, minx, maxx, from, to);
-	result.y = normalize_between(target.y, minx, maxx, from, to);
-	result.z = normalize_between(target.z, minx, maxx, from, to);
+	result.x = map_in_range(target.x, minx, maxx, from, to);
+	result.y = map_in_range(target.y, minx, maxx, from, to);
+	result.z = map_in_range(target.z, minx, maxx, from, to);
 	return result;
 }
 
 inline v4
-normalize_v4(v4 target, float minx, float maxx, float from, float to)
+v4_map_in_range(v4 target, float minx, float maxx, float from, float to)
 {
 	v4 result = {};
-	result.x = normalize_between(target.x, minx, maxx, from, to);
-	result.y = normalize_between(target.y, minx, maxx, from, to);
-	result.z = normalize_between(target.z, minx, maxx, from, to);
-	result.w = normalize_between(target.w, minx, maxx, from, to);
+	result.x = map_in_range(target.x, minx, maxx, from, to);
+	result.y = map_in_range(target.y, minx, maxx, from, to);
+	result.z = map_in_range(target.z, minx, maxx, from, to);
+	result.w = map_in_range(target.w, minx, maxx, from, to);
 	return result;
 }
 
@@ -417,42 +411,27 @@ identity()
 }
 
 inline f64
-double_normalize_between(f64 x, f64 minx, f64 maxx, f64 a, f64 b)
+double_map_in_range(f64 x, f64 minx, f64 maxx, f64 a, f64 b)
 {
 	f64 Result = ((b - a) * ((x - minx) / (maxx - minx)) + a);
 	return Result;
 }
 
 inline float
-get_distance_3d(v3 pa, v3 pb)
+v3_distance_squared(v3 pa, v3 pb)
 {
-	f32 maxx, minx;
-	if (pa.x > pb.x)
-	{
-		maxx = pa.x;
-		minx = pb.x;
-	}
-	else
-	{
-		maxx = pb.x;
-		minx = pa.x;
-	}
+	float x = pb.x - pa.x;
+	float y = pb.y - pa.y;
+	float z = pb.z - pa.z;
+	f32 c = SQUARE(x) + SQUARE(y) + SQUARE(z);
 
-	f32 maxy, miny;
-	if (pa.y > pb.y)
-	{
-		maxy = pa.y;
-		miny = pb.y;
-	}
-	else
-	{
-		maxy = pb.y;
-		miny = pa.y;
-	}
+	return c;
+}
 
-	f32 a = maxx - minx;
-	f32 b = maxy - miny;
-	f32 c = sqrtf(a * a + b * b);
+inline float
+v3_distance(v3 pa, v3 pb)
+{
+	f32 c = sqrtf(v3_distance_squared(pa, pb));
 
 	return c;
 }
